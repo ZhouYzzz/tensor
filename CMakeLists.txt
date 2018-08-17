@@ -5,5 +5,9 @@ cmake_minimum_required (VERSION 3.8)
 
 project ("tensor")
 
+# Add CUDA support
+find_package(cuda)
+include_directories(${CUDA_INCLUDE_DIRS})
+
 # Include sub-projects.
-add_subdirectory ("tensor")
+add_subdirectory ("src")
