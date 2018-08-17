@@ -3,6 +3,7 @@
 #include <sstream>
 #include <cuda.h>
 #include <cudnn.h>
+#include <cufft.h>
 
 // (default) SINGLE GPU
 #define SINGLE_GPU
@@ -28,6 +29,14 @@
   std::stringstream _error;                                          \
   if (status != 0) {                                                 \
     _error << "Cuda failure: " << cudaGetErrorString(status);        \
+    FatalError(_error.str());                                        \
+  }                                                                  \
+} while(0)
+
+#define CHECK_CUFFT(status) do {                                     \
+  std::stringstream _error;                                          \
+  if (status != CUFFT_SUCCESS) {                                     \
+    _error << "Cufft failure: ";                                     \
     FatalError(_error.str());                                        \
   }                                                                  \
 } while(0)

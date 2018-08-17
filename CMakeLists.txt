@@ -16,4 +16,4 @@ include_directories(${CUDA_INCLUDE_DIRS})
 add_subdirectory ("src")
 
 # UnitTest
-add_subdirectory("test")
+# add_subdirectory("test")
