@@ -1,8 +1,16 @@
 #pragma once
 
+#include <iostream>
+#include <complex>
 #include <cufft.h>
 
 #include "tensor.h"
+
+std::ostream &operator<< (std::ostream &os, const cufftComplex &d) {
+  auto c = reinterpret_cast<const std::complex<float>*>(&d);
+  os << *c;
+  return os;
+}
 
 void fft1d(Tensor<cufftComplex>& src, Tensor<cufftComplex>& dst) {
   cufftHandle plan;

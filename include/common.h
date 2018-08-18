@@ -5,6 +5,8 @@
 #include <cudnn.h>
 #include <cufft.h>
 
+#include <glog/logging.h>
+
 // (default) SINGLE GPU
 #define SINGLE_GPU
 
@@ -41,6 +43,16 @@
   }                                                                  \
 } while(0)
 
-#define DISABLE_ASSIGN_COPY(Class)                                   \
-  Class(const Class&) = delete;                                      \
-  Class& operator=(const Class&) = delete;                           \
+// CUDA: grid stride looping
+#define CUDA_KERNEL_LOOP(i, n) \
+  for (int i = blockIdx.x * blockDim.x + threadIdx.x; \
+       i < (n); \
+       i += blockDim.x * gridDim.x)
+
+// CUDA: use 512 threads per block
+const int CUDA_NUM_THREADS = 512;
+
+// CUDA: number of blocks for threads.
+inline int CUDA_NUM_BLOCKS(const int N) {
+  return (N + CUDA_NUM_THREADS - 1) / CUDA_NUM_THREADS;
+}

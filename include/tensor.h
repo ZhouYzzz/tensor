@@ -54,20 +54,40 @@ public:
   inline size_t size() { return size_; }
   inline size_t count() { return count_; }
 
+  // T* mutable_gpu_data(unsigned n = 0, unsigned c = 0, unsigned h = 0, unsigned w = 0) {
+  //   return reinterpret_cast<T*>(mem_->mutable_gpu_data()) + offset(n, c, h, w);
+  // }
+  // const T*   gpu_data(unsigned n = 0, unsigned c = 0, unsigned h = 0, unsigned w = 0) {
+  //   return reinterpret_cast<const T*>(mem_->gpu_data()) + offset(n, c, h, w);
+  // }
+  // T* mutable_cpu_data(unsigned n = 0, unsigned c = 0, unsigned h = 0, unsigned w = 0) {
+  //   return reinterpret_cast<T*>(mem_->mutable_cpu_data()) + offset(n, c, h, w);
+  // }
+  // const T*   cpu_data(unsigned n = 0, unsigned c = 0, unsigned h = 0, unsigned w = 0) {
+  //   return reinterpret_cast<const T*>(mem_->cpu_data()) + offset(n, c, h, w);
+  // }
 
-  T* mutable_gpu_data(unsigned n = 0, unsigned c = 0, unsigned h = 0, unsigned w = 0) {
-    return reinterpret_cast<T*>(mem_->mutable_gpu_data()) + offset(n, c, h, w);
+  // template func
+  template <typename DT = T>
+  DT* mutable_gpu_data(unsigned n = 0, unsigned c = 0, unsigned h = 0, unsigned w = 0) {
+    CHECK_EQ(sizeof(T), sizeof(DT));
+    return reinterpret_cast<DT*>(mem_->mutable_gpu_data()) + offset(n, c, h, w);
   }
-  const T*   gpu_data(unsigned n = 0, unsigned c = 0, unsigned h = 0, unsigned w = 0) {
-    return reinterpret_cast<const T*>(mem_->gpu_data()) + offset(n, c, h, w);
+  template <typename DT = T>
+  const DT*   gpu_data(unsigned n = 0, unsigned c = 0, unsigned h = 0, unsigned w = 0) {
+    CHECK_EQ(sizeof(T), sizeof(DT));
+    return reinterpret_cast<const DT*>(mem_->gpu_data()) + offset(n, c, h, w);
   }
-  T* mutable_cpu_data(unsigned n = 0, unsigned c = 0, unsigned h = 0, unsigned w = 0) {
-    return reinterpret_cast<T*>(mem_->mutable_cpu_data()) + offset(n, c, h, w);
+  template <typename DT = T>
+  DT* mutable_cpu_data(unsigned n = 0, unsigned c = 0, unsigned h = 0, unsigned w = 0) {
+    CHECK_EQ(sizeof(T), sizeof(DT));
+    return reinterpret_cast<DT*>(mem_->mutable_cpu_data()) + offset(n, c, h, w);
   }
-  const T*   cpu_data(unsigned n = 0, unsigned c = 0, unsigned h = 0, unsigned w = 0) {
-    return reinterpret_cast<const T*>(mem_->cpu_data()) + offset(n, c, h, w);
+  template <typename DT = T>
+  const DT*   cpu_data(unsigned n = 0, unsigned c = 0, unsigned h = 0, unsigned w = 0) {
+    CHECK_EQ(sizeof(T), sizeof(DT));
+    return reinterpret_cast<const DT*>(mem_->cpu_data()) + offset(n, c, h, w);
   }
-
 private:
   inline int offset(unsigned n = 0, unsigned c = 0, unsigned h = 0, unsigned w = 0) {
     return w + w_ * (h + h_ * (c + c_ * n));
@@ -79,5 +99,28 @@ private:
 
   //DISABLE_ASSIGN_COPY(Tensor);
 };
+
+template <typename T>
+std::ostream &operator<<(std::ostream &os, Tensor<T>& t) {
+  os << "Tensor" << "<"
+    << t.n() << ","
+    << t.c() << ","
+    << t.h() << ","
+    << t.w() << ","
+    << ">" << std::endl;
+  if (t.h() <= 11 && t.w() <= 11) {
+    for (int i = 0; i < t.h(); i++) {
+      os << "  ";
+      for (int j = 0; j < t.w(); j++)
+        os << *(t.cpu_data(0, 0, i, j)) << ",";
+      os << std::endl;
+    }
+  }
+  return os;
+}
+
+void f_memset(int n, float a, float *x);
+
+void f_memcpyadd2D(float* dst, int old, int ostride, const float* src, int iw, int ih, int howmany);
 
 // TODO: Reference additional headers your program requires here.

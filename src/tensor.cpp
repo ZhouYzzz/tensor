@@ -3,6 +3,8 @@
 
 #include "tensor.h"
 
+#include <cstring> // memset
+
 using namespace std;
 
 SyncedMemory::SyncedMemory()

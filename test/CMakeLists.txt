@@ -10,5 +10,5 @@ set(TEST_SRCS
 
 add_executable(runUnitTest ${TEST_SRCS})
 
-target_link_libraries(runUnitTest gtest)
+target_link_libraries(runUnitTest gtest gtest_main)
 target_link_libraries(runUnitTest tensor)

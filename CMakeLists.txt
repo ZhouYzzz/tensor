@@ -1,19 +1,28 @@
 ﻿# CMakeList.txt : Top-level CMake project file, do global configuration
 # and include sub-projects here.
 #
-cmake_minimum_required (VERSION 3.8)
+cmake_minimum_required (VERSION 3.5)
 
 project ("tensor")
+# Enable CXX11 features
+set (CMAKE_CXX_STANDARD 11)
 
 # Include Local files
 include_directories("include")
 
+# Module search path
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake/Modules")
+
 # Add CUDA support
-find_package(cuda)
+find_package(CUDA)
 include_directories(${CUDA_INCLUDE_DIRS})
+
+# Glog
+find_package(Glog)
+include_directories(${Glog_INCLUDE_DIRS})
 
 # Include sub-projects.
 add_subdirectory ("src")
 
 # UnitTest
-# add_subdirectory("test")
+add_subdirectory("test")
