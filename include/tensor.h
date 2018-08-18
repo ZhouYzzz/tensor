@@ -109,7 +109,7 @@ std::ostream &operator<<(std::ostream &os, Tensor<T>& t) {
     << t.h() << ","
     << t.w() << ","
     << ">" << std::endl;
-  for (int n = 0; n < std::min(static_cast<int>(t.n()), 2); n++) {
+  for (int n = 0; n < t.n(); n++) {
   if (t.h() <= 11 && t.w() <= 11) {
     for (int i = 0; i < t.h(); i++) {
       os << "  ";
@@ -122,17 +122,5 @@ std::ostream &operator<<(std::ostream &os, Tensor<T>& t) {
   }
   return os;
 }
-
-void f_memset(int n, float a, float *x);
-
-void f_memcpyadd2D(float* dst, int old, int ostride, const float* src, int iw, int ih, int howmany);
-
-void assignAdd2DImpl(
-  const float* src, int src_ld, int src_stride,
-  float* dst, int dst_ld, int dst_stride,
-  int height, int width, int howmany);
-
-template <typename T>
-void assignAdd2D(Tensor<T>& src, Tensor<T>& dst);
 
 // TODO: Reference additional headers your program requires here.
