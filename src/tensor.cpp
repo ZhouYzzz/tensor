@@ -87,6 +87,7 @@ void SyncedMemory::to_gpu() {
 
 void* SyncedMemory::mutable_gpu_data() {
   to_gpu();
+  head_ = HEAD_AT_GPU;
   return gpu_ptr_;
 }
 const void*   SyncedMemory::gpu_data() {
@@ -95,6 +96,7 @@ const void*   SyncedMemory::gpu_data() {
 }
 void* SyncedMemory::mutable_cpu_data() {
   to_cpu();
+  head_ = HEAD_AT_CPU;
   return cpu_ptr_;
 }
 const void*   SyncedMemory::cpu_data() {

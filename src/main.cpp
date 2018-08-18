@@ -33,6 +33,9 @@ int main()
 
   Tensor<float> xx(2, 1, 5, 7);
   Tensor<float> yy(2, 1, 2, 3);
+  
+
+/*
   f_memset(35, 2, xx.mutable_gpu_data());
 
   for (int i = 0; i < 2*3; i++) {
@@ -58,17 +61,44 @@ int main()
       2,
       1
     );
-  // for (int i = 0; i < yy.count(); i++) {
-  //   yy.mutable_cpu_data()[i] = 1;
-  // }
-  // for (int i = 0; i < xx.count(); i++) {
-  //   xx.mutable_cpu_data()[i] = 2;
-  // }
+  
+  // xx.cpu_data();
+  cout << xx << endl;
+  cout << yy << endl;
+  */
 
+
+  for (int i = 0; i < yy.count(); i++) {
+    yy.mutable_cpu_data()[i] = 1;
+  }
+  for (int i = 0; i < xx.count(); i++) {
+    xx.mutable_cpu_data()[i] = 2;
+  }
+
+  assignAdd2DImpl(
+    yy.gpu_data(),
+    yy.w(),
+    yy.w() * yy.h(),
+    xx.mutable_gpu_data(),
+    xx.w(),
+    xx.w() * xx.h(),
+    yy.h(),
+    yy.w(),
+    yy.n() * yy.c()
+  );
+
+  // yy.gpu_data();
+  // xx.gpu_data();
+
+  // assignAdd2DImpl(
+  //   yy.gpu_data(), 3, 6,
+  //   xx.mutable_gpu_data(), 7, 35,
+  //   2, 3, 1
+  // );
   // assignAdd2D(yy, xx);
 
   cout << xx << endl;
-
+  cout << yy << endl;
 
   return 0;
 }
