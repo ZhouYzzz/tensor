@@ -18,6 +18,7 @@ find_package(CUDA)
 include_directories(${CUDA_INCLUDE_DIRS})
 
 # Glog
+add_subdirectory("glog-0.3.5")
 find_package(Glog)
 include_directories(${Glog_INCLUDE_DIRS})
 
@@ -25,4 +26,4 @@ include_directories(${Glog_INCLUDE_DIRS})
 add_subdirectory ("src")
 
 # UnitTest
-add_subdirectory("test")
+# add_subdirectory("test")
