@@ -36,6 +36,10 @@ private:
   SyncedHead head_;
   size_t size_;
   int device_;
+
+  // Since SyncedMemory is managed by shared_ptr, copy and assignment
+  // are not permitted.
+  DISABLE_COPY_AND_ASSIGN(SyncedMemory);
 };
 
 /* Tensor class */
@@ -47,6 +51,10 @@ public:
   n_(n), c_(c), h_(h), w_(w), count_(n*c*h*w), size_(n*c*h*w*sizeof(T)) {
     mem_.reset(new SyncedMemory(size_));
   }
+  // We use the default copy and assignment constructors here
+  Tensor(const Tensor&) = default;
+  Tensor& operator=(const Tensor&) = default;
+
   inline unsigned n() const { return n_; }
   inline unsigned c() const { return c_; }
   inline unsigned h() const { return h_; }
@@ -79,8 +87,6 @@ private:
 
   unsigned n_, c_, h_, w_;
   size_t size_, count_;
-
-  //DISABLE_ASSIGN_COPY(Tensor);
 };
 
 template <typename T>

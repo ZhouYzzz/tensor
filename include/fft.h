@@ -5,52 +5,26 @@
 #include <cufft.h>
 #include <cublas.h>
 
+#include <unordered_map>
+
 #include "common.h"
 #include "tensor.h"
 #include "cuda_helper.h"
 
+using std::unordered_map;
 
-std::ostream &operator<< (std::ostream &os, const cufftComplex &d) {
-  auto c = reinterpret_cast<const std::complex<float>*>(&d);
-  os << *c;
-  return os;
-}
+std::ostream &operator<< (std::ostream &os, const cufftComplex &d);
 
-void fft1d(Tensor<cufftComplex>& src, Tensor<cufftComplex>& dst) {
-  cufftHandle plan;
-  int n = src.w();
-  CHECK_CUFFT(cufftPlan1d(&plan, n,
-    CUFFT_C2C, src.n() * src.c() * src.w()));
-  CHECK_CUFFT(
-    cufftExecC2C(plan, src.mutable_gpu_data(), dst.mutable_gpu_data(), CUFFT_FORWARD));
-  CHECK_CUFFT(cudaDeviceSynchronize());
-  CHECK_CUFFT(cufftDestroy(plan));
-}
+// Old APIs
+void fft1d(Tensor<cufftComplex>& src, Tensor<cufftComplex>& dst);
+void fft2d(Tensor<cufftComplex>& src, Tensor<cufftComplex>& dst);
+void ifft2d(Tensor<cufftComplex>& src, Tensor<cufftComplex>& dst, bool scale = true);
+void fft2d(Tensor<float>& src, Tensor<cufftComplex>& dst);
+Tensor<cufftComplex> fft2d(Tensor<float>& src);
+void ifft2d(Tensor<cufftComplex>& src, Tensor<float>& dst);
 
-void fft2d(Tensor<cufftComplex>& src, Tensor<cufftComplex>& dst) {
-  cufftHandle plan;
-  int n[] = {src.h(), src.w()};
-  CHECK_CUFFT(cufftPlanMany(&plan, 2, n,
-    NULL, 1, src.h() * src.w(),
-    NULL, 1, src.h() * src.w(),
-    CUFFT_C2C, src.n() * src.c()));
-  CHECK_CUFFT(
-    cufftExecC2C(plan, src.mutable_gpu_data(), dst.mutable_gpu_data(), CUFFT_FORWARD));
-  CHECK_CUFFT(cudaDeviceSynchronize());
-  CHECK_CUFFT(cufftDestroy(plan));
-}
-
-void ifft2d(Tensor<cufftComplex>& src, Tensor<cufftComplex>& dst, bool scale = true) {
-  cufftHandle plan;
-  int n[] = {src.h(), src.w()};
-  CHECK_CUFFT(cufftPlanMany(&plan, 2, n,
-    NULL, 1, src.h() * src.w(),
-    NULL, 1, src.h() * src.w(),
-    CUFFT_C2C, src.n() * src.c()));
-  CHECK_CUFFT(
-    cufftExecC2C(plan, src.mutable_gpu_data(), dst.mutable_gpu_data(), CUFFT_INVERSE));
-  float a = 1.f / (src.h() * src.w());
-  CHECK_CUBLAS(cublasCsscal_v2(cublas_handle(), dst.count(), &a, dst.mutable_gpu_data(), 1));
-  CHECK_CUFFT(cudaDeviceSynchronize());
-  CHECK_CUFFT(cufftDestroy(plan));
-}
+// planed APIs
+void fft2_planed(Tensor<cufftComplex>& src, Tensor<cufftComplex>& dst);
+void fft2_planed(Tensor<float>& src, Tensor<cufftComplex>& dst);
+void ifft2_planed(Tensor<cufftComplex>& src, Tensor<cufftComplex>& dst, bool scale = true);
+void ifft2_planed(Tensor<cufftComplex>& src, Tensor<float>& dst, bool scale = true);

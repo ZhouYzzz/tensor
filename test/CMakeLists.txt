@@ -9,6 +9,7 @@ include_directories("googletest/include")
 
 set(TEST_SRCS
   "zero_test.cpp"
+  "fft_test.cpp"
 )
 
 add_executable(runUnitTest ${TEST_SRCS})
