@@ -31,7 +31,7 @@ void assignAdd2DImpl(
 }
 
 template <>
-void assignAdd2D(Tensor<float>& src, Tensor<float>& dst) {
+void assignAdd2D(const Tensor<float>& src, Tensor<float>& dst) {
   CHECK_LE(src.n(), dst.n());
   CHECK_LE(src.c(), dst.c());
   // TODO: broadcast support
@@ -49,7 +49,7 @@ void assignAdd2D(Tensor<float>& src, Tensor<float>& dst) {
 }
 
 template <>
-void assignAdd2D(Tensor<cuComplex>& src, Tensor<cuComplex>& dst) {
+void assignAdd2D(const Tensor<cuComplex>& src, Tensor<cuComplex>& dst) {
   CHECK_LE(src.n(), dst.n());
   CHECK_LE(src.c(), dst.c());
   // TODO: broadcast support

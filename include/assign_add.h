@@ -9,4 +9,4 @@ void assignAdd2DImpl(
   int height, int width, int howmany);
 
 template <typename T>
-void assignAdd2D(Tensor<T>& src, Tensor<T>& dst);
+void assignAdd2D(const Tensor<T>& src, Tensor<T>& dst);

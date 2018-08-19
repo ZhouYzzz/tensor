@@ -79,6 +79,7 @@ private:
   float* workspace_ = NULL;
 };
 
+// create global cuda_instance
 static Cuda* cuda_instance_ = new Cuda();
 
 cudnnHandle_t cudnn_handle() { return cuda_instance_->cudnn_handle(); }
