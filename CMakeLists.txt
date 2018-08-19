@@ -16,6 +16,9 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake/Modules")
 # Add CUDA support
 find_package(CUDA)
 include_directories(${CUDA_INCLUDE_DIRS})
+if(MSVC)
+  link_directories("$ENV{CUDA_PATH}/lib/x64")
+endif()
 
 # Glog
 if(MSVC)
@@ -29,6 +32,4 @@ include_directories(${Glog_INCLUDE_DIRS})
 add_subdirectory ("src")
 
 # UnitTest
-if(NOT MSVC)
-  add_subdirectory("test")
-endif()
+add_subdirectory("test")

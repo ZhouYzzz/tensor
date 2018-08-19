@@ -10,9 +10,6 @@ CUDA_ADD_LIBRARY (tensor STATIC "tensor.cpp"
 
 CUDA_ADD_CUFFT_TO_TARGET(tensor)
 CUDA_ADD_CUBLAS_TO_TARGET(tensor)
-if(MSVC)
-  link_directories("$ENV{CUDA_PATH}/lib/x64")
-endif()
 target_link_libraries(tensor glog cudnn)
 
 add_executable (main "main.cpp")

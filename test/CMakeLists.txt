@@ -1,5 +1,8 @@
 enable_testing()
 
+# SEE https://github.com/google/googletest/blob/master/googletest/README.md#visual-studio-dynamic-vs-static-runtimes
+set(gtest_force_shared_crt ON)
+
 add_subdirectory ("googletest")
 
 include_directories("googletest/include")
