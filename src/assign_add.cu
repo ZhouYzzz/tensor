@@ -5,9 +5,6 @@ __global__ void assign_add_2d_float_kernel(
   const float* src, int src_ld, int src_stride,
   float* dst, int dst_ld, int dst_stride,
   int height, int width, int howmany) {
-  // CUDA_KERNEL_LOOP(i, n) {
-  //   dst[i] = 0;
-  // }
   CUDA_KERNEL_LOOP(i, n) {
     int w = i % width;
     int h = (i / width) % height;
@@ -47,6 +44,24 @@ void assignAdd2D(Tensor<float>& src, Tensor<float>& dst) {
     dst.w() * dst.h(),
     src.h(),
     src.w(),
+    src.n() * src.c()
+  );
+}
+
+template <>
+void assignAdd2D(Tensor<cuComplex>& src, Tensor<cuComplex>& dst) {
+  CHECK_LE(src.n(), dst.n());
+  CHECK_LE(src.c(), dst.c());
+  // TODO: broadcast support
+  assignAdd2DImpl(
+    src.gpu_data<float>(),
+    src.w() * 2,
+    src.w() * src.h() * 2,
+    dst.mutable_gpu_data<float>(),
+    dst.w() * 2,
+    dst.w() * dst.h() * 2,
+    src.h(),
+    src.w() * 2,
     src.n() * src.c()
   );
 }

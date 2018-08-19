@@ -70,22 +70,22 @@ public:
   // template func
   template <typename DT = T>
   DT* mutable_gpu_data(unsigned n = 0, unsigned c = 0, unsigned h = 0, unsigned w = 0) {
-    CHECK_EQ(sizeof(T), sizeof(DT));
+    //CHECK_EQ(sizeof(T), sizeof(DT));
     return reinterpret_cast<DT*>(mem_->mutable_gpu_data()) + offset(n, c, h, w);
   }
   template <typename DT = T>
   const DT*   gpu_data(unsigned n = 0, unsigned c = 0, unsigned h = 0, unsigned w = 0) {
-    CHECK_EQ(sizeof(T), sizeof(DT));
+    //CHECK_EQ(sizeof(T), sizeof(DT));
     return reinterpret_cast<const DT*>(mem_->gpu_data()) + offset(n, c, h, w);
   }
   template <typename DT = T>
   DT* mutable_cpu_data(unsigned n = 0, unsigned c = 0, unsigned h = 0, unsigned w = 0) {
-    CHECK_EQ(sizeof(T), sizeof(DT));
+    //CHECK_EQ(sizeof(T), sizeof(DT));
     return reinterpret_cast<DT*>(mem_->mutable_cpu_data()) + offset(n, c, h, w);
   }
   template <typename DT = T>
   const DT*   cpu_data(unsigned n = 0, unsigned c = 0, unsigned h = 0, unsigned w = 0) {
-    CHECK_EQ(sizeof(T), sizeof(DT));
+    //CHECK_EQ(sizeof(T), sizeof(DT));
     return reinterpret_cast<const DT*>(mem_->cpu_data()) + offset(n, c, h, w);
   }
 private:

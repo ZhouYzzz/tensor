@@ -1,13 +1,17 @@
 #pragma once
 
 #include <sstream>
+#include <iostream>
 #include <cuda.h>
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
 #include <cudnn.h>
 #include <cufft.h>
+#include <cublas.h>
 
 #include <glog/logging.h>
+
+using namespace std;
 
 // (default) SINGLE GPU
 #define SINGLE_GPU
@@ -41,6 +45,14 @@
   std::stringstream _error;                                          \
   if (status != CUFFT_SUCCESS) {                                     \
     _error << "Cufft failure: ";                                     \
+    FatalError(_error.str());                                        \
+  }                                                                  \
+} while(0)
+
+#define CHECK_CUBLAS(status) do {                                     \
+  std::stringstream _error;                                          \
+  if (status != CUBLAS_STATUS_SUCCESS) {                                     \
+    _error << "CuBLAS failure: ";                                     \
     FatalError(_error.str());                                        \
   }                                                                  \
 } while(0)

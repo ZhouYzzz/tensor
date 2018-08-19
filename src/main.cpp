@@ -1,6 +1,7 @@
 #include "tensor.h"
 #include "fft.h"
 #include "assign_add.h"
+#include "cuda_helper.h"
 
 #include <complex>
 
@@ -58,6 +59,28 @@ int main()
 
   cout << xx << endl;
   cout << yy << endl;
+
+
+  // FFT
+  Tensor<cufftComplex> g(1, 1, 3, 5);
+  Tensor<cufftComplex> h(1, 1, 3, 5);
+  g.mutable_cpu_data<complex<float>>(0, 0, 0, 0)[0] = 1;
+  g.mutable_cpu_data<complex<float>>(0, 0, 0, 0)[1] = 1;
+  h.mutable_cpu_data<complex<float>>(0, 0, 2, 3)[0] = 1;
+  h.mutable_cpu_data<complex<float>>(0, 0, 2, 3)[1] = 1;
+  cout << g << endl;
+  cout << h << endl;
+
+  fft2d(g, g);
+  fft2d(h, h);
+
+  cout << g << endl;
+  cout << h << endl;
+
+  assignAdd2D(g, h);
+
+  ifft2d(h, h);
+  cout << h << endl;
 
   getchar();
 

@@ -18,12 +18,17 @@ find_package(CUDA)
 include_directories(${CUDA_INCLUDE_DIRS})
 
 # Glog
-add_subdirectory("glog-0.3.5")
-find_package(Glog)
+if(MSVC)
+  add_subdirectory("glog-0.3.5")
+else()
+  find_package(Glog)
+endif()
 include_directories(${Glog_INCLUDE_DIRS})
 
 # Include sub-projects.
 add_subdirectory ("src")
 
 # UnitTest
-# add_subdirectory("test")
+if(NOT MSVC)
+  add_subdirectory("test")
+endif()
