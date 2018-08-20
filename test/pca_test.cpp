@@ -5,17 +5,26 @@
 #include "pca.h"
 
 TEST(PCA, SVD) {
-  Tensor<float> A(1, 1, 2, 2);
+  Tensor<float> A(1, 1, 3, 3);
   A.mutable_cpu_data()[0] = 1;
-  A.mutable_cpu_data()[1] = 5;
-  A.mutable_cpu_data()[2] = 5;
-  A.mutable_cpu_data()[3] = 1;
+  A.mutable_cpu_data()[1] = 4;
+  A.mutable_cpu_data()[2] = 2;
+  A.mutable_cpu_data()[3] = 4;
+  A.mutable_cpu_data()[4] = 13;
+  A.mutable_cpu_data()[5] = 5;
+  A.mutable_cpu_data()[6] = 2;
+  A.mutable_cpu_data()[7] = 5;
+  A.mutable_cpu_data()[8] = 16;
+
 
   cout << A << endl;
 
   Tensor<float> S, U, V;
-  SVD(A, S, U, V);
-  cout << S << U << V << endl;
+  //SVD(A, S, U, V);
+  //cout << A << S << U << V << endl;
+
+  SVD_econ(A, S, U, V);
+  cout << A << S << U << V << endl;
 }
 
 void printMatrix(int m, int n, const double*A, int lda, const char* name)

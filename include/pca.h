@@ -1,5 +1,6 @@
 #pragma once
 
+#include <assert.h>
 #include "tensor.h"
 #include "cuda_helper.h"
 
@@ -33,7 +34,57 @@ namespace ECO {
 }
 
 // WIP: a low level routine for svd
-void gesvdj();
+// params:
+// A:(m, n), S:(1, min(m, n)), U:(m, min(m, n)), V:(n, min(m, n))
+// NOTE: On exit, the contents of A are destroyed.
+void gesvdj(int m, int n, float* A, float* S, float* U, float* V) {
+  cusolverDnSgesvdj;
+  cusolverDnHandle_t handle = cusolverDn_handle();
+  cusolverEigMode_t jobz = CUSOLVER_EIG_MODE_VECTOR;
+  int econ = 1;
+  int lda = m;
+  int ldu = m;
+  int ldv = n;
+  float* d_work = NULL;
+  int lwork = 0;
+  int* d_info = NULL;
+  int info = 0;
+  gesvdjInfo_t params;
+  const double tol = 1.e-7;
+  CHECK_CUSOLVER(cusolverDnCreateGesvdjInfo(&params));
+  CHECK_CUSOLVER(cusolverDnXgesvdjSetTolerance(params, tol));
+  CHECK_CUSOLVER(cusolverDnSgesvdj_bufferSize(handle, jobz, econ,
+    m, n, A, lda, S, U, ldu, V, ldv, &lwork, params));
+  CHECK_CUDA(cudaMalloc(&d_work, sizeof(float)*lwork));
+  CHECK_CUDA(cudaMalloc(&d_info, sizeof(int)));
+  CHECK_CUSOLVER(cusolverDnSgesvdj(handle, jobz, econ,
+    m, n, A, lda, S, U, ldu, V, ldv, d_work, lwork, d_info, params));
+  CHECK_CUDA(cudaDeviceSynchronize());
+  CHECK_CUDA(cudaMemcpy(&info, d_info, sizeof(int), cudaMemcpyDeviceToHost));
+  CHECK_EQ(info, 0) << "gesvdj fail";
+  CHECK_CUDA(cudaFree(d_work));
+  CHECK_CUDA(cudaFree(d_info));
+  CHECK_CUSOLVER(cusolverDnDestroyGesvdjInfo(params));
+}
+
+// Econ version of SVD
+// A is represented in fortran format, symmetric matrix doesn't matter, but otherwise not tested
+// TODO: test general case
+void SVD_econ(Tensor<float>& A, Tensor<float>& S, Tensor<float>& U, Tensor<float>& V) {
+  CHECK_EQ(A.n() * A.c(), 1) << "Only 2D Matrix is supported";
+  int m = A.w(); // m is leading dim, since svd takes fortran format, m == A.w() in C++
+  int n = A.h();
+  int d = fmin(m, n); // size of second dim
+  S.create(1, 1, 1, d);
+  U.create(1, 1, d, m);
+  V.create(1, 1, d, n);
+  gesvdj(m, n,
+    A.mutable_gpu_data(),
+    S.mutable_gpu_data(),
+    U.mutable_gpu_data(),
+    V.mutable_gpu_data());
+}
+
 
 // The SVD used in ECO applies on symmetric matrix (X' * X)
 // This makes things much more easier than general case.
