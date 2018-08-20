@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include <cudnn.h>
 #include <cufft.h>
 #include <cublas.h>
+#include <cusolverDn.h>
 
 #include <glog/logging.h>
 
@@ -63,7 +64,7 @@ THE SOFTWARE.
 #define CHECK_CUFFT(status) do {                                     \
   std::stringstream _error;                                          \
   if (status != CUFFT_SUCCESS) {                                     \
-    _error << "Cufft failure: ";                                     \
+    _error << "Cufft failure: " << status;                                     \
     FatalError(_error.str());                                        \
   }                                                                  \
 } while(0)
@@ -71,7 +72,15 @@ THE SOFTWARE.
 #define CHECK_CUBLAS(status) do {                                    \
   std::stringstream _error;                                          \
   if (status != CUBLAS_STATUS_SUCCESS) {                             \
-    _error << "CuBLAS failure: ";                                    \
+    _error << "CuBLAS failure: " << status;                                    \
+    FatalError(_error.str());                                        \
+  }                                                                  \
+} while(0)
+
+#define CHECK_CUSOLVER(status) do {                                  \
+  std::stringstream _error;                                          \
+  if (status != CUSOLVER_STATUS_SUCCESS) {                           \
+    _error << "CuSolver failure: " << status;                                  \
     FatalError(_error.str());                                        \
   }                                                                  \
 } while(0)
@@ -92,5 +101,6 @@ inline int CUDA_NUM_BLOCKS(const int N) {
 
 cudnnHandle_t cudnn_handle();
 cublasHandle_t cublas_handle();
+cusolverDnHandle_t cusolverDn_handle();
 float* cudnn_get_workspace();
 void cudnn_set_workspace(size_t size);

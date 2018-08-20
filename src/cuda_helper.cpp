@@ -37,27 +37,31 @@ public:
     LOG(INFO) << "Tearing up CUDA environment..";
 
     // destroy handles if created
-    if (cudnn_handle_inited_)
+    if (cudnn_handle_)
       CHECK_CUDNN(cudnnDestroy(cudnn_handle_));
-    if (cublas_handle_inited_)
+    if (cublas_handle_)
       CHECK_CUBLAS(cublasDestroy_v2(cublas_handle_));
 
     // reset CUDA device
     CHECK_CUDA(cudaDeviceReset());
   }
   inline cudnnHandle_t cudnn_handle() {
-    if (!cudnn_handle_inited_) {
+    if (!cudnn_handle_) {
       CHECK_CUDNN(cudnnCreate(&cudnn_handle_));
-      cudnn_handle_inited_ = true;
     }
     return cudnn_handle_;
   }
   inline cublasHandle_t cublas_handle() {
-    if (!cublas_handle_inited_) {
+    if (!cublas_handle_) {
       CHECK_CUBLAS(cublasCreate_v2(&cublas_handle_));
-      cublas_handle_inited_ = true;
     }
     return cublas_handle_;
+  }
+  inline cusolverDnHandle_t cusolverDn_handle() {
+    if (!cusolverDn_handle_) {
+      CHECK_CUSOLVER(cusolverDnCreate(&cusolverDn_handle_));
+    }
+    return cusolverDn_handle_;
   }
   inline float* workspace() { return workspace_; }
   inline void set_workspace(size_t size) {
@@ -71,12 +75,14 @@ public:
     }
   }
 private:
-  cudnnHandle_t cudnn_handle_;
-  bool cudnn_handle_inited_ = false;
-  cublasHandle_t cublas_handle_;
-  bool cublas_handle_inited_ = false;
+  cudnnHandle_t cudnn_handle_ = NULL;
   size_t size_ = 0;
   float* workspace_ = NULL;
+
+  cublasHandle_t cublas_handle_ = NULL;
+
+  cusolverDnHandle_t cusolverDn_handle_ = NULL;
+
 };
 
 // create global cuda_instance
@@ -84,5 +90,6 @@ static Cuda* cuda_instance_ = new Cuda();
 
 cudnnHandle_t cudnn_handle() { return cuda_instance_->cudnn_handle(); }
 cublasHandle_t cublas_handle() { return cuda_instance_->cublas_handle(); }
+cusolverDnHandle_t cusolverDn_handle() { return cuda_instance_->cusolverDn_handle(); }
 float* cudnn_get_workspace() { return cuda_instance_->workspace(); }
 void cudnn_set_workspace(size_t size) { cuda_instance_->set_workspace(size); }

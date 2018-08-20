@@ -3,6 +3,8 @@
 // HASH: gpu_memory -> corresponding handle
 unordered_map<void*, cufftHandle> stored_handles_;
 
+
+// legacy API
 // EXP: only R2C is implemented, TODO: add other types, introduce static engine
 cufftHandle getOrCreateHandle(const Tensor<float>& src, const Tensor<cuComplex>& dst) {
   void* ptr = (void*)src.gpu_data();
@@ -23,6 +25,7 @@ template <typename ST, typename DT>
 cufftHandle cufft_handle(const Tensor<ST>& src, const Tensor<DT>& dst, cufftType type) {
   void* ptr = (void*)src.gpu_data();
   if (stored_handles_.count(ptr) == 0) {
+    // create fft plan (lazy)
     cufftHandle plan;
 
     int n[2] = { 0 };
@@ -141,6 +144,7 @@ void ifft2d(Tensor<cufftComplex>& src, Tensor<float>& dst) {
 }
 
 
+// TODO: add auto created `dst` tensor with `create()` method
 void fft2_planed(Tensor<cufftComplex>& src, Tensor<cufftComplex>& dst) {
   cufftHandle plan = cufft_handle(src, dst, CUFFT_C2C);
   CHECK_CUFFT(
@@ -179,4 +183,3 @@ void ifft2_planed(Tensor<cufftComplex>& src, Tensor<float>& dst, bool scale) {
     CHECK_CUBLAS(cublasSscal_v2(cublas_handle(), dst.count(), &a, dst.mutable_gpu_data(), 1));
   }
 }
-

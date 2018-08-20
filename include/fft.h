@@ -15,7 +15,7 @@ using std::unordered_map;
 
 std::ostream &operator<< (std::ostream &os, const cufftComplex &d);
 
-// Old APIs
+// Legacy APIs
 void fft1d(Tensor<cufftComplex>& src, Tensor<cufftComplex>& dst);
 void fft2d(Tensor<cufftComplex>& src, Tensor<cufftComplex>& dst);
 void ifft2d(Tensor<cufftComplex>& src, Tensor<cufftComplex>& dst, bool scale = true);

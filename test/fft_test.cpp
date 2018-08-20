@@ -45,7 +45,9 @@ TEST(FFT, FFT2D) {
 TEST(FFT, Speed) {
   Tensor<cuComplex> x(60, 64, 31, 31);
   Tensor<cuComplex> xf(60, 64, 31, 31);
-  Tensor<float> x2(60, 64, 31, 60);
-  for (int i = 0; i < 100; i++)
-    fft2_planed(x2, xf);
+  //Tensor<float> x2(60, 64, 31, 60);
+  //Tensor<cuComplex> xf;
+  for (int i = 0; i < 1; i++)
+    fft2_planed(x, xf);
+  cout << xf.property_string() << endl;
 }
