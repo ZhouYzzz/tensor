@@ -32,7 +32,7 @@ void matmul(const Tensor<float>& A, const Tensor<float>& B, Tensor<float>& C, CB
   CHECK_EQ(KA, KB) << "K dim dismatch";
 
   int K = KA;
-
+  LOG(INFO) << "matmul:M " << M << " N " << N << " K " << K;
   //CHECK_EQ(B.h(), K) << "Dim dismatch";
   C.create(1, 1, M, N);
   gemm(TransA, TransB, M, N, K,
@@ -67,11 +67,12 @@ namespace ECO {
       N, PC, C, &alpha, F, ldb, P, lda, &beta, PF, N));
   }
 
-  void feature_projection(const Tensor<float>& P, const Tensor<float>& F, Tensor<float>& PF, const int compressed_dim) {
+  void matmul_feature_projection(const Tensor<float>& P, const Tensor<float>& F, Tensor<float>& PF, const int compressed_dim) {
     CHECK_EQ(P.n() * P.c(), 1);
+    CHECK_GT(F.c(), 1); // F: (1, C>1, H ,W)
     CHECK_EQ(F.n(), 1);
     CHECK_EQ(P.h(), P.w());
-    CHECK_EQ(P.h(), F.c());
+    //CHECK_EQ(P.h(), F.h());
     PF.create(F.n(), compressed_dim, F.h(), F.w());
     gemm_feature_projection(CblasTrans, CblasNoTrans,
       compressed_dim, F.h() * F.w(), F.c(), 1, P.gpu_data(), F.gpu_data(), 0, PF.mutable_gpu_data());

@@ -18,3 +18,5 @@ using namespace std;
 private:\
   classname(const classname&) = delete;\
   classname& operator=(const classname&) = delete;
+
+#define NOT_IMPLEMENTED LOG(FATAL) << "Not Implemented Yet"

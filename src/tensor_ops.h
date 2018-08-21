@@ -30,5 +30,5 @@ namespace ECO {
     const float alpha, const float* P, const float* F, const float beta,
     float* PF);
 
-  void feature_projection(const Tensor<float>& P, const Tensor<float>& F, Tensor<float>& PF, const int compressed_dim);
+  void matmul_feature_projection(const Tensor<float>& P, const Tensor<float>& F, Tensor<float>& PF, const int compressed_dim);
 }

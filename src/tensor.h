@@ -48,42 +48,22 @@ template <typename T>
 class Tensor {
 public:
   Tensor() {}
-  explicit Tensor(unsigned n, unsigned c, unsigned h, unsigned w) :
-  n_(n), c_(c), h_(h), w_(w), count_(n*c*h*w), size_(n*c*h*w*sizeof(T)) {
-    mem_.reset(new SyncedMemory(size_));
-  }
+  explicit Tensor(unsigned n, unsigned c, unsigned h, unsigned w);
+  // perform shallow/deep copy
+  Tensor(const Tensor& copy, bool deep_copy);
   
   // WIP, TODO: refer to cv::Mat::create() [core\src\matrix.cpp]
   // create a new memory block for access (usually as an output arg)
-  void create(unsigned n, unsigned c, unsigned h, unsigned w) {
-    int count = n * c * h * w;
-    int size = count * sizeof(T);
-    if (size > size_)
-      mem_.reset(new SyncedMemory(size));
-    count_ = count;
-    size_ = size;
-    n_ = n; c_ = c; h_ = h; w_ = w;
-  }
+  void create(unsigned n, unsigned c, unsigned h, unsigned w);
 
-  // WIP: reshape only, without changing the underlying data
-  void reshape(unsigned n, unsigned c, unsigned h, unsigned w) {
-    int count = n * c * h * w;
-    CHECK_EQ(count, count_) << "Total elements dismatch";
-    n_ = n; c_ = c; h_ = h; w_ = w;
-  }
+  // WIP: reshape only, without changing the underlying data, but the shape information
+  void reshape(unsigned n, unsigned c, unsigned h, unsigned w);
 
-  Tensor<T>& deep_copy() {
-    Tensor<T> t(n_, c_, h_, w_);
-    CHECK_CUDA(cudaMemcpy(t.mutable_gpu_data(), gpu_data(), size_, cudaMemcpyDeviceToDevice));
-    return t;
-  }
+  Tensor<T>& reshape(unsigned n, unsigned c, unsigned h, unsigned w) const;
 
-  std::string property_string() {
-    std::stringstream s_;
-    s_ << "<Tensor object of shape ("\
-      << n_ << ',' << c_ << ',' << h_ << ',' << w_ << ")>";
-    return s_.str();
-  }
+  Tensor<T> deep_copy() const;
+
+  std::string property_string();
 
   // We use the default copy and assignment constructors here
   Tensor(const Tensor&) = default;
@@ -148,3 +128,70 @@ std::ostream &operator<<(std::ostream &os, const Tensor<T>& t) {
 }
 
 // TODO: Reference additional headers your program requires here.
+
+template<typename T>
+inline Tensor<T>::Tensor(unsigned n, unsigned c, unsigned h, unsigned w) :
+  n_(n), c_(c), h_(h), w_(w), count_(n*c*h*w), size_(n*c*h*w * sizeof(T)) {
+  mem_.reset(new SyncedMemory(size_));
+}
+
+// WIP, TODO: refer to cv::Mat::create() [core\src\matrix.cpp]
+// create a new memory block for access (usually as an output arg)
+template<typename T>
+inline void Tensor<T>::create(unsigned n, unsigned c, unsigned h, unsigned w) {
+  int count = n * c * h * w;
+  int size = count * sizeof(T);
+  if (size > size_)
+    mem_.reset(new SyncedMemory(size));
+  count_ = count;
+  size_ = size;
+  n_ = n; c_ = c; h_ = h; w_ = w;
+}
+
+// WIP: reshape only, without changing the underlying data
+template<typename T>
+inline void Tensor<T>::reshape(unsigned n, unsigned c, unsigned h, unsigned w) {
+  int count = n * c * h * w;
+  CHECK_EQ(count, count_) << "Total elements dismatch";
+  n_ = n; c_ = c; h_ = h; w_ = w;
+}
+
+
+// perform shallow/deep copy
+template<typename T>
+inline Tensor<T>::Tensor(const Tensor & copy, bool deep_copy) : Tensor(copy.n(), copy.c(), copy.h(), copy.w()) {
+  if (deep_copy) {
+    if (copy.mem_.get()->size() > 0) // mem_ inited
+      CHECK_CUDA(cudaMemcpy(mutable_gpu_data(), copy.gpu_data(), copy.size(), cudaMemcpyDeviceToDevice));
+  }
+  else {
+    mem_.reset(copy.mem_.get());
+  }
+}
+
+template<typename T>
+inline Tensor<T>& Tensor<T>::reshape(unsigned n, unsigned c, unsigned h, unsigned w) const
+{
+  NOT_IMPLEMENTED; // throw
+  // TODO: insert return statement here
+  Tensor<T> t = *this; // create a copy of this tensor
+  t.reshape(n, c, h, w); // then change its shape without affecting this tensor
+  return t;
+}
+
+template<typename T>
+Tensor<T> Tensor<T>::deep_copy() const {
+  // Something wrong here, probably because t is deallocated on return
+  //NOT_IMPLEMENTED;
+  Tensor<T> t(n_, c_, h_, w_);
+  CHECK_CUDA(cudaMemcpy(t.mutable_gpu_data(), this->gpu_data(), this->size_, cudaMemcpyDeviceToDevice));
+  return t;
+}
+
+template<typename T>
+inline std::string Tensor<T>::property_string() {
+  std::stringstream s_;
+  s_ << "<Tensor object of shape ("\
+    << n_ << ',' << c_ << ',' << h_ << ',' << w_ << ")>";
+  return s_.str();
+}

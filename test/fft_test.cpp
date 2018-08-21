@@ -18,11 +18,11 @@ TEST(FFT, FFT2D) {
   x.mutable_cpu_data()[1] = 1;
   x.mutable_cpu_data(0, 0, 1, 0)[0] = 1;
   x.mutable_cpu_data(1, 0, 0, 0)[0] = 1;
-  //cout << x << endl;
+  //LOG(INFO) << x << endl;
   Tensor<cuComplex> xf = fft2d(x);
-  //cout << xf << endl;
+  //LOG(INFO) << xf << endl;
   ifft2d(xf, x2);
-  //cout << x2 << endl;
+  //LOG(INFO) << x2 << endl;
 
   CHECK_TENSOR_NEAR(x2, x, 1e-6);
 
@@ -30,14 +30,14 @@ TEST(FFT, FFT2D) {
   Tensor<float> y2(2, 1, 3, 5);
   y.mutable_cpu_data(0, 0, 1, 0)[1] = 1;
   y.mutable_cpu_data(1, 0, 1, 0)[1] = 1;
-  //cout << y << endl;
+  //LOG(INFO) << y << endl;
   Tensor<cuComplex> yf = fft2d(y);
-  //cout << yf << endl;
+  //LOG(INFO) << yf << endl;
 
   assignAdd2D(xf, yf);
   assignAdd2D(x, y);
   ifft2d(yf, y2);
-  //cout << y << endl;
+  //LOG(INFO) << y << endl;
 
   CHECK_TENSOR_NEAR(y, y2, 1e-6);
 }
@@ -49,5 +49,5 @@ TEST(FFT, Speed) {
   //Tensor<cuComplex> xf;
   for (int i = 0; i < 1; i++)
     fft2_planed(x, xf);
-  cout << xf.property_string() << endl;
+  LOG(INFO) << xf.property_string() << endl;
 }

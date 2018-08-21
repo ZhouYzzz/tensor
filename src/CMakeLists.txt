@@ -6,6 +6,7 @@
 CUDA_ADD_LIBRARY (tensor STATIC "tensor.cpp"
                                 "tensor_ops.cpp"
                                 "fft.cpp"
+                                "pca.cpp"
                                 "cuda_helper.cpp"
                                 "assign_add.cu")
 

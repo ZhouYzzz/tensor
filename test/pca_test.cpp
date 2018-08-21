@@ -17,14 +17,34 @@ TEST(PCA, SVD) {
   A.mutable_cpu_data()[8] = 16;
 
 
-  cout << A << endl;
+  LOG(INFO) << A << endl;
 
   Tensor<float> S, U, V;
   //SVD(A, S, U, V);
-  //cout << A << S << U << V << endl;
+  //LOG(INFO) << A << S << U << V << endl;
 
   SVD_econ(A, S, U, V);
-  cout << A << S << U << V << endl;
+  LOG(INFO) << A << S << U << V << endl;
+}
+
+TEST(PCA, PCA) {
+  Tensor<float> A(1, 2, 3, 3);
+  A.mutable_cpu_data()[0] = 1;
+  A.mutable_cpu_data()[2] = 1;
+  A.mutable_cpu_data()[6] = 1;
+  A.mutable_cpu_data()[8] = 1;
+  A.mutable_cpu_data(0, 1, 0, 0)[0] = 1;
+  A.mutable_cpu_data(0, 1, 0, 0)[4] = 1;
+  A.mutable_cpu_data(0, 1, 0, 0)[8] = 1;
+  LOG(INFO) << A << endl;
+
+  Tensor<float> P;
+  ECO::calculate_projection_matrix(A, P);
+
+  LOG(INFO) << P;
+  Tensor<float> AP;
+  ECO::project_sample(A, P, 1, AP);
+  LOG(INFO) << AP;
 }
 
 void printMatrix(int m, int n, const double*A, int lda, const char* name)
@@ -37,7 +57,7 @@ void printMatrix(int m, int n, const double*A, int lda, const char* name)
   }
 }
 
-TEST(PCA, SVD_example) {
+TEST(DISABLED_PCA, SVD_example) {
   cusolverDnHandle_t cusolverH = NULL;
   cudaStream_t stream = NULL;
   gesvdjInfo_t gesvdj_params = NULL;

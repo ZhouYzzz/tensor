@@ -1,4 +1,5 @@
 #include "pca.h"
+#include "tensor_ops.h"
 
 // WIP: a low level routine for svd
 // params:
@@ -129,4 +130,30 @@ void SVD(Tensor<float>& A, Tensor<float>& S, Tensor<float>& U, Tensor<float>& V)
   );
   CHECK_CUDA(cudaFree(d_work));
   //LOG(INFO) << *info;
+}
+
+void ECO::calculate_projection_matrix(const Tensor<float>& feature, Tensor<float>& P)
+{
+  CHECK_EQ(feature.n(), 1);
+
+  // TODO: no deep copy is required
+  Tensor<float> F = feature.deep_copy();
+  //Tensor<float> F(feature, true);
+  F.reshape(1, 1, feature.c(), feature.h() * feature.w());
+  //cout << F << endl;
+  Tensor<float> FF;
+  matmul(F, F, FF, CblasNoTrans, CblasTrans); // FF = F * Trans(F), shaped (1, 1, c, c)
+  CHECK_EQ(FF.h(), FF.w());
+  CHECK_EQ(FF.h(), F.h()); // F has been reshaped
+  //cout << FF << endl;
+  Tensor<float> S, U, V;
+  SVD_econ(FF, S, U, V);
+  //cout << S << U << V;
+  P = V;
+}
+
+void ECO::project_sample(const Tensor<float>& feature, const Tensor<float>& P, const int compressed_dim, Tensor<float>& projected)
+{
+  Tensor<float> F = feature;
+  ECO::matmul_feature_projection(P, F, projected, compressed_dim);
 }

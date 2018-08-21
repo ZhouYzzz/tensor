@@ -16,16 +16,16 @@ TEST(TensorOps, matmul) {
     A.mutable_cpu_data()[i] = i;
   for (int i = 0; i < B.count(); i++)
     B.mutable_cpu_data()[i] = i;
-  cout << A << endl;
-  cout << B << endl;
+  LOG(INFO) << A << endl;
+  LOG(INFO) << B << endl;
   Tensor<float> C;
   //C.create(1, 1, 3, 3);
   matmul(A, B, C);
-  cout << C << endl;
+  LOG(INFO) << C << endl;
 
   Tensor<float> D;
   matmul(A, A, D, CblasTrans, CblasNoTrans);
-  cout << D << endl;
+  LOG(INFO) << D << endl;
   matmul(A, A, D, CblasNoTrans, CblasTrans);
-  cout << D << endl;
+  LOG(INFO) << D << endl;
 }
