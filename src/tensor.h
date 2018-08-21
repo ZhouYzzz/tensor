@@ -72,6 +72,12 @@ public:
     n_ = n; c_ = c; h_ = h; w_ = w;
   }
 
+  Tensor<T>& deep_copy() {
+    Tensor<T> t(n_, c_, h_, w_);
+    CHECK_CUDA(cudaMemcpy(t.mutable_gpu_data(), gpu_data(), size_, cudaMemcpyDeviceToDevice));
+    return t;
+  }
+
   std::string property_string() {
     std::stringstream s_;
     s_ << "<Tensor object of shape ("\

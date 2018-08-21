@@ -9,6 +9,7 @@ set (CMAKE_CXX_STANDARD 11)
 
 # Include Local files
 include_directories("include")
+include_directories("src")
 
 # Module search path
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake/Modules")
